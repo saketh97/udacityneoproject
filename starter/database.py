@@ -14,6 +14,9 @@ class NEODatabase(object):
         """
         :param filename: str representing the pathway of the filename containing the Near Earth Object data
         """
+        self.filename = filename
+        self.orbits  = {}
+        self.neos = {}
         # TODO: What data structures will be needed to store the NearEarthObjects and OrbitPaths?
         # TODO: Add relevant instance variables for this.
 
@@ -31,6 +34,14 @@ class NEODatabase(object):
             raise Exception('Cannot load data, no filename provided')
 
         filename = filename or self.filename
+        neo_data_file = open(filename,'r')
+        columns_in_data = neo_data_file.readline().split(',')
+        line_by_line = neo_data_file.readlines()
+        for line in line_by_line:
+            data = line.split(',')
+            data_dict = {columns_in_data[i]: data[i] for i in range(len(columns_in_data))}
+            
+            # Next step to create dicts to store orbits,neo objects
 
         # TODO: Load data from csv file.
         # TODO: Where will the data be stored?
