@@ -26,7 +26,7 @@ class NearEarthObject(object):
 
         self.list_of_orbits.append(orbit)
 
-    def __str__(self):
+    def __repr__(self):
         return ('id:'+self.id+' name:'+self.name+' diameter:'+self.estimated_diameter_min_kilometers+' is hazardous:'+self.is_potentially_hazardous_asteroid)
 
 
@@ -47,5 +47,5 @@ class OrbitPath(object):
                 self.key = value
 
 
-    def __str__(self):
+    def __repr__(self):
         return ('neo_name:'+self.name+' distance:'+self.miss_distance_kilometers+' date:'+self.close_approach_date)
