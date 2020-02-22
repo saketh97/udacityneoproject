@@ -35,6 +35,14 @@ class Query(object):
         :param kwargs: dict of search query parameters to determine which SearchOperation query to use
         """
         # TODO: What instance variables will be useful for storing on the Query object?
+        if('start_date' in kwargs.keys()):
+            self.dates = DateSearch('between',kwargs['start_date']+","+kwargs['end_date'])
+        else:
+            self.dates = DateSearch('equals',kwargs['date'])
+        self.number = kwargs['n']
+        self.to_return = kwargs['r']
+
+
 
     def build_query(self):
         """
@@ -43,7 +51,7 @@ class Query(object):
 
         :return: QueryBuild.Selectors namedtuple that translates the dict of query options into a SearchOperation
         """
-
+        return Selectors(self.dates,self.number,'',self.to_return)
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
 
 
