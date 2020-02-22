@@ -11,10 +11,11 @@ class NearEarthObject(object):
         """
 
         self.list_of_orbits = []
-        for key,value in kwargs.items():
-            if(key in ['id','name','estimated_diameter_min_kilometers','is_potentially_hazardous_asteroid']):
-               self.key = value
-        self.list_of_orbits.append(OrbitPath(kwargs))
+        self.id = kwargs['id']
+        self.name =kwargs['name']
+        self.estimated_diameter_min_kilometers = kwargs['estimated_diameter_min_kilometers']
+        self.is_potentially_hazardous_asteroid = kwargs['is_potentially_hazardous_asteroid']
+        self.list_of_orbits.append(OrbitPath(**kwargs))
 
     def update_orbits(self, orbit):
         """
@@ -41,10 +42,9 @@ class OrbitPath(object):
         """
         :param kwargs:    dict of attributes about a given orbit, only a subset of attributes used
         """
-
-        for key,value in kwargs.items():
-            if(key in ['name','miss_distance_kilometers','close_approach_date']):
-                self.key = value
+        self.name = kwargs['name']
+        self.miss_distance_kilometers = kwargs['miss_distance_kilometers']
+        self.close_approach_date = kwargs['close_approach_date']
 
 
     def __repr__(self):

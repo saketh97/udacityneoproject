@@ -34,24 +34,26 @@ class NEODatabase(object):
             raise Exception('Cannot load data, no filename provided')
 
         filename = filename or self.filename
-        neo_data_file = open(filename,'r')
-        columns_in_data = neo_data_file.readline().split(',')
-        line_by_line = neo_data_file.readlines()
-        for line in line_by_line:
-            data = line.split(',')
-            data_dict = {columns_in_data[i]: data[i] for i in range(len(columns_in_data))}
-            if(data_dict['name'] in self.neos.keys()):
-                orbit = OrbitPath(data_dict)
-                self.neo[orbit.name].update_orbits(orbit)
-                self.orbits[orbit.close_approach_date] = [orbit.name]
-            else:
-                neo = NearEarthObject(data_dict)
-                self.neos[neo.name] = neo
-                if(data_dict['close_approach_date'] in self.orbits.keys()):
-                    self.orbits[data_dict['close_approach_date']].append(neo.name)
+        try:
+            neo_data_file = open(filename,'r')
+            columns_in_data = neo_data_file.readline().split(',')
+            line_by_line = neo_data_file.readlines()
+            for line in line_by_line:
+                data = line.split(',')
+                data_dict = {columns_in_data[i]: data[i] for i in range(len(columns_in_data))}
+                if(data_dict['name'] in self.neos.keys()):
+                    orbit = OrbitPath(**data_dict)
+                    self.neos[orbit.name].update_orbits(orbit)
+                    self.orbits[orbit.close_approach_date] = [orbit.name]
                 else:
-                    self.orbits[data_dict['close_approach_date']] = [neo.name]
-
+                    neo = NearEarthObject(**data_dict)
+                    self.neos[neo.name] = neo
+                    if(data_dict['close_approach_date'] in self.orbits.keys()):
+                        self.orbits[data_dict['close_approach_date']].append(neo.name)
+                    else:
+                        self.orbits[data_dict['close_approach_date']] = [neo.name]
+        finally:
+            neo_data_file.close
             # Next step to create dicts to store orbits,neo objects
 
         # TODO: Load data from csv file.
