@@ -1,5 +1,6 @@
 from collections import namedtuple
 from enum import Enum
+from datetime import datetime
 
 from exceptions import UnsupportedFeature
 from models import NearEarthObject, OrbitPath
@@ -25,7 +26,6 @@ class Query(object):
     Object representing the desired search query operation to build. The Query uses the Selectors
     to structure the query information into a format the NEOSearcher can use for date search.
     """
-
     Selectors = namedtuple('Selectors', ['date_search', 'number', 'filters', 'return_object'])
     DateSearch = namedtuple('DateSearch', ['type', 'values'])
     ReturnObjects = {'NEO': NearEarthObject, 'Path': OrbitPath}
@@ -35,12 +35,14 @@ class Query(object):
         :param kwargs: dict of search query parameters to determine which SearchOperation query to use
         """
         # TODO: What instance variables will be useful for storing on the Query object?
+        print(kwargs.keys())
         if('start_date' in kwargs.keys()):
-            self.dates = DateSearch('between',kwargs['start_date']+","+kwargs['end_date'])
+            value = kwargs['start_date']+','+kwargs['end_date']
+            self.dates = Query.DateSearch('between',value)
         else:
-            self.dates = DateSearch('equals',kwargs['date'])
-        self.number = kwargs['n']
-        self.to_return = kwargs['r']
+            self.dates = Query.DateSearch('equals',kwargs['date'])
+        self.number = kwargs['number']
+        self.to_return = kwargs['return_object']
 
 
 
@@ -51,7 +53,7 @@ class Query(object):
 
         :return: QueryBuild.Selectors namedtuple that translates the dict of query options into a SearchOperation
         """
-        return Selectors(self.dates,self.number,'',self.to_return)
+        return Query.Selectors(self.dates,self.number,'',self.to_return)
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
 
 
@@ -130,3 +132,28 @@ class NEOSearcher(object):
         # TODO: Write instance methods that get_objects can use to implement the two types of DateSearch your project
         # TODO: needs to support that then your filters can be applied to. Remember to return the number specified in
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
+        date = query[0]
+        count = query[1]
+        neos_list = []
+        print(self.db.orbits)
+        print(date[0])
+        print(date[1])
+        if('equals' in date[0]):
+            try:
+                neos_names = self.db.orbits[date[1]]
+                for i in neo_names:
+                    neos_list.append(self.db.neos[i])
+            except:
+                neo_list=['']
+
+        elif('between' in date[0]):
+            start = date[1].split(',')[0]
+            end = date[1].split(',')[1]
+            neos = {''}
+            for i in  self.db.orbits.keys():
+                if((datetime.strptime(start, "%yyyy-%mm-%dd") <= datetime.strptime(i, "%yyyy-%mm-%dd")) and (datetime.strptime(end, "%yyyy-%mm-%dd") >= datetime.strptime(i, "%yyyy-%mm-%dd"))):
+                    for j in self.db.orbits[i]:
+                        neos.add(j)
+            for i in list(neos):
+                neos_list=neos_list.append(self.db.neos[i])
+        return neos_list
