@@ -35,7 +35,6 @@ class Query(object):
         :param kwargs: dict of search query parameters to determine which SearchOperation query to use
         """
         # TODO: What instance variables will be useful for storing on the Query object?
-        print(kwargs.keys())
         if('start_date' in kwargs.keys()):
             value = kwargs['start_date']+','+kwargs['end_date']
             self.dates = Query.DateSearch('between',value)
@@ -134,26 +133,24 @@ class NEOSearcher(object):
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
         date = query[0]
         count = query[1]
-        neos_list = []
-        print(self.db.orbits)
-        print(date[0])
-        print(date[1])
+        neos_list=[]
         if('equals' in date[0]):
             try:
                 neos_names = self.db.orbits[date[1]]
                 for i in neo_names:
                     neos_list.append(self.db.neos[i])
             except:
-                neo_list=['']
+                neo_list=[]
 
         elif('between' in date[0]):
             start = date[1].split(',')[0]
             end = date[1].split(',')[1]
-            neos = {''}
-            for i in  self.db.orbits.keys():
-                if((datetime.strptime(start, "%yyyy-%mm-%dd") <= datetime.strptime(i, "%yyyy-%mm-%dd")) and (datetime.strptime(end, "%yyyy-%mm-%dd") >= datetime.strptime(i, "%yyyy-%mm-%dd"))):
+            neos=[]
+            for i in self.db.orbits.keys():
+                if((datetime.strptime(start,"%Y-%m-%d") <= datetime.strptime(i,"%Y-%m-%d")) and (datetime.strptime(end,"%Y-%m-%d") >= datetime.strptime(i,"%Y-%m-%d"))):
                     for j in self.db.orbits[i]:
-                        neos.add(j)
+                        neos.append(j)
+            neos = list(set(neos))
             for i in list(neos):
-                neos_list=neos_list.append(self.db.neos[i])
+                neos_list.append(self.db.neos[i])
         return neos_list

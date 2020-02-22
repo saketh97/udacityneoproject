@@ -10,7 +10,7 @@ class NearEarthObject(object):
         :param kwargs:    dict of attributes about a given Near Earth Object, only a subset of attributes used
         """
 
-        self.list_of_orbits = []
+        self.list_of_orbits=[]
         self.id = kwargs['id']
         self.name =kwargs['name']
         self.estimated_diameter_min_kilometers = kwargs['estimated_diameter_min_kilometers']

@@ -53,7 +53,7 @@ class NEODatabase(object):
                     else:
                         self.orbits[data_dict['close_approach_date']] = [neo.name]
         finally:
-            neo_data_file.close
+            neo_data_file.close()
             # Next step to create dicts to store orbits,neo objects
 
         # TODO: Load data from csv file.
