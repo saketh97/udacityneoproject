@@ -5,22 +5,6 @@ from datetime import datetime
 from exceptions import UnsupportedFeature
 from models import NearEarthObject, OrbitPath
 
-
-class DateSearch(Enum):
-    """
-    Enum representing supported date search on Near Earth Objects.
-    """
-    between = 'between'
-    equals = 'equals'
-
-    @staticmethod
-    def list():
-        """
-        :return: list of string representations of DateSearchType enums
-        """
-        return list(map(lambda output: output.value, DateSearch))
-
-
 class Query(object):
     """
     Object representing the desired search query operation to build. The Query uses the Selectors
@@ -133,12 +117,16 @@ class NEOSearcher(object):
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
         date = query[0]
         count = query[1]
+        print(count)
         neos_list=[]
         if('equals' in date[0]):
             try:
                 neos_names = self.db.orbits[date[1]]
-                for i in neo_names:
+                for i in neos_names:
                     neos_list.append(self.db.neos[i])
+                    count= count-1
+                    if(count == 0):
+                        break
             except:
                 neo_list=[]
 
@@ -150,7 +138,14 @@ class NEOSearcher(object):
                 if((datetime.strptime(start,"%Y-%m-%d") <= datetime.strptime(i,"%Y-%m-%d")) and (datetime.strptime(end,"%Y-%m-%d") >= datetime.strptime(i,"%Y-%m-%d"))):
                     for j in self.db.orbits[i]:
                         neos.append(j)
+
             neos = list(set(neos))
             for i in list(neos):
                 neos_list.append(self.db.neos[i])
+                count= count-1
+                if(count == 0):
+                    break
+
+        for i in neos_list:
+            print(i)
         return neos_list

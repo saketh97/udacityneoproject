@@ -43,8 +43,11 @@ class NEODatabase(object):
                 data_dict = {columns_in_data[i]: data[i] for i in range(len(columns_in_data))}
                 if(data_dict['name'] in self.neos.keys()):
                     orbit = OrbitPath(**data_dict)
-                    self.neos[orbit.name].update_orbits(orbit)
-                    self.orbits[orbit.close_approach_date] = [orbit.name]
+                    self.neos[orbit.neo_name].update_orbits(orbit)
+                    if(data_dict['close_approach_date'] in self.orbits.keys()):
+                        self.orbits[data_dict['close_approach_date']].append(orbit.neo_name)
+                    else:
+                        self.orbits[orbit.close_approach_date] = [orbit.neo_name]
                 else:
                     neo = NearEarthObject(**data_dict)
                     self.neos[neo.name] = neo

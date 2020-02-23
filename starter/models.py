@@ -10,12 +10,12 @@ class NearEarthObject(object):
         :param kwargs:    dict of attributes about a given Near Earth Object, only a subset of attributes used
         """
 
-        self.list_of_orbits=[]
+        self.orbits=[]
         self.id = kwargs['id']
         self.name =kwargs['name']
-        self.estimated_diameter_min_kilometers = kwargs['estimated_diameter_min_kilometers']
-        self.is_potentially_hazardous_asteroid = kwargs['is_potentially_hazardous_asteroid']
-        self.list_of_orbits.append(OrbitPath(**kwargs))
+        self.diameter_min_km = float(kwargs['estimated_diameter_min_kilometers'])
+        self.is_potentially_hazardous_asteroid = bool(kwargs['is_potentially_hazardous_asteroid'])
+        self.orbits.append(OrbitPath(**kwargs))
 
     def update_orbits(self, orbit):
         """
@@ -24,11 +24,16 @@ class NearEarthObject(object):
         :param orbit: OrbitPath
         :return: None
         """
+        orbit_exists=0
+        for orbit_list_elem in self.orbits:
+            if(orbit_list_elem.__eq__(orbit)):
+                orbit_exists=1
+                break
+        if(orbit_exists==0):
+            self.orbits.append(orbit)
 
-        self.list_of_orbits.append(orbit)
-
-    def __repr__(self):
-        return ('id:'+self.id+' name:'+self.name+' diameter:'+self.estimated_diameter_min_kilometers+' is hazardous:'+self.is_potentially_hazardous_asteroid)
+    def __str__(self):
+            return "\n id=%s  name=%s  \n orbits=\n %s \n orbitdates=\n %s" % (self.id,self.name,"\n ".join(str(orbit) for orbit in self.orbits),"\n ".join(str(orbit.close_approach_date) for orbit in self.orbits))
 
 
 class OrbitPath(object):
@@ -42,10 +47,12 @@ class OrbitPath(object):
         """
         :param kwargs:    dict of attributes about a given orbit, only a subset of attributes used
         """
-        self.name = kwargs['name']
-        self.miss_distance_kilometers = kwargs['miss_distance_kilometers']
+        self.neo_name = kwargs['name']
+        self.miss_distance_kilometers = float(kwargs['miss_distance_kilometers'])
         self.close_approach_date = kwargs['close_approach_date']
 
+    def __eq__(self,other):
+        return self.close_approach_date == other.close_approach_date and self.miss_distance_kilometers == other.miss_distance_kilometers
 
-    def __repr__(self):
-        return ('neo_name:'+self.name+' distance:'+self.miss_distance_kilometers+' date:'+self.close_approach_date)
+    def __str__(self):
+        return ("neo_name=%s distance=%s date=%s" %(self.neo_name,str(self.miss_distance_kilometers),str(self.close_approach_date)))
