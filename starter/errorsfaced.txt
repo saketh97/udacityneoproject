@@ -7,3 +7,13 @@ Souliton :1
 ---------------
 To solve This issue i have added equals function in orbit class which tells if two orbit paths are same based on date and distance. When the neo updates orbits it will check if the orbit is already present in list by using the equals
 method. So now in the orbits list of the noe object there will be no duplicate entries. 
+
+
+Issue no 2
+---------------
+1. When Query is to be built we get arguments passed as input. But that argument contains all keys eg: bot Date and Start_date,End_date all three keys will be present. So if in the args date is mentioned rest of the two keys
+ will be None when checking on which we have to search it is showing an issue.
+
+Solution For 2
+-------------------
+So when we receive kwargs in query init function we remove all the Key,value pairs with None as value so that only required Keys are present.

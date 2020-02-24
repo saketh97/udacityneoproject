@@ -34,7 +34,7 @@ class NearEarthObject(object):
             self.orbits.append(orbit)
 
     def __str__(self):
-            return "\n id=%s  name=%s  \n orbits=\n %s \n orbitdates=\n %s" % (self.id,self.name,"\n ".join(str(orbit) for orbit in self.orbits),"\n ".join(str(orbit.close_approach_date) for orbit in self.orbits))
+            return "id:%s=>name:%s=>orbits:%s=>orbitdates:%s" % (self.id,self.name,", ".join(str(orbit) for orbit in self.orbits),", ".join(str(orbit.close_approach_date) for orbit in self.orbits))
 
 
 class OrbitPath(object):
@@ -59,4 +59,4 @@ class OrbitPath(object):
         return self.close_approach_date == other.close_approach_date and self.miss_distance_kilometers == other.miss_distance_kilometers
 
     def __str__(self):
-        return ("neo_name=%s distance=%s date=%s" %(self.neo_name,str(self.miss_distance_kilometers),str(self.close_approach_date)))
+        return ("neo_name=%s / distance=%s / date=%s" %(self.neo_name,str(self.miss_distance_kilometers),str(self.close_approach_date)))

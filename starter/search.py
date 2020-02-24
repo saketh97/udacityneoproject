@@ -17,17 +17,19 @@ class Query(object):
     def __init__(self, **kwargs):
         """
         :param kwargs: dict of search query parameters to determine which SearchOperation query to use
+
+        if any key kwargs does not have value it will show None so lets handle it.
         """
         # TODO: What instance variables will be useful for storing on the Query object?
-        if('start_date' in kwargs.keys()):
-            value = kwargs['start_date']+','+kwargs['end_date']
-            self.dates = Query.DateSearch('between',value)
-        else:
-            self.dates = Query.DateSearch('equals',kwargs['date'])
-        self.number = kwargs['number']
-        self.to_return = kwargs['return_object']
+        self.kwargs = {}
+        for key,value in kwargs.items():
+            if kwargs[key] is not None:
+                self.kwargs[key] = value
 
-
+        self.number = 0
+        self.to_return = 'NEO'
+        self.dates = Query.DateSearch('e',0)
+        print(self.kwargs)
 
     def build_query(self):
         """
@@ -36,6 +38,14 @@ class Query(object):
 
         :return: QueryBuild.Selectors namedtuple that translates the dict of query options into a SearchOperation
         """
+        if('start_date' in self.kwargs.keys()):
+            value = self.kwargs['start_date']+','+self.kwargs['end_date']
+            self.dates = Query.DateSearch('between',value)
+        else:
+            self.dates = Query.DateSearch('equals',self.kwargs['date'])
+            self.number = self.kwargs['number']
+            self.to_return = self.kwargs['return_object']
+
         return Query.Selectors(self.dates,self.number,'',self.to_return)
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
 
@@ -146,6 +156,4 @@ class NEOSearcher(object):
                 if(count == 0):
                     break
 
-        for i in neos_list:
-            print(i)
         return neos_list
