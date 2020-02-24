@@ -42,12 +42,17 @@ class NEOWriter(object):
         PROJECT_ROOT = pathlib.Path(__file__).parent.absolute()
 
         result = data
+        if(len(result) == 0):
+            print("No NEO Matched the search requirement")
+            return 1
+
         if(format == 'display'):
             for neo in result:
                 stri = neo.__str__()
                 stri = stri.replace("=>","\n").replace(" / "," ")
                 stri = stri.replace(", ","\n")
                 print(stri+"\n")
+
             return 1
 
         elif(format == 'csv_file'):

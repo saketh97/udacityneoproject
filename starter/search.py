@@ -26,11 +26,6 @@ class Query(object):
             if kwargs[key] is not None:
                 self.kwargs[key] = value
 
-        self.number = 0
-        self.to_return = 'NEO'
-        self.dates = Query.DateSearch('e',0)
-        print(self.kwargs)
-
     def build_query(self):
         """
         Transforms the provided query options, set upon initialization, into a set of Selectors that the NEOSearcher
@@ -127,7 +122,6 @@ class NEOSearcher(object):
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
         date = query[0]
         count = query[1]
-        print(count)
         neos_list=[]
         if('equals' in date[0]):
             try:
