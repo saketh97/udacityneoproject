@@ -19,7 +19,8 @@ class NearEarthObject(object):
 
     def update_orbits(self, orbit):
         """
-        Adds an orbit path information to a Near Earth Object list of orbits
+        Adds an orbit path information to a Near Earth Object list of orbits. Before adding the orbit
+        it will check if the orbit already exists in orbits list for that we use eq function of the orbit class.
 
         :param orbit: OrbitPath
         :return: None
@@ -52,6 +53,9 @@ class OrbitPath(object):
         self.close_approach_date = kwargs['close_approach_date']
 
     def __eq__(self,other):
+        """
+        equals method returns true if the close approach date and miss distance is same for two orbits of same neo. Else it will return false
+        """
         return self.close_approach_date == other.close_approach_date and self.miss_distance_kilometers == other.miss_distance_kilometers
 
     def __str__(self):

@@ -1,0 +1,9 @@
+Issue  no 1
+-------------
+1. When running the test cases and printing the returned neo i have observed that the neo objects are storing duplicate orbit paths also i.e, the date of orbit and distance are same for two orbits. Accroding to csv there are
+duplicate elements.
+
+Souliton :1
+---------------
+To solve This issue i have added equals function in orbit class which tells if two orbit paths are same based on date and distance. When the neo updates orbits it will check if the orbit is already present in list by using the equals
+method. So now in the orbits list of the noe object there will be no duplicate entries. 
