@@ -1,10 +1,9 @@
 from collections import namedtuple
 from enum import Enum
 from datetime import datetime
-
 from exceptions import UnsupportedFeature
 from models import NearEarthObject, OrbitPath
-
+import operator
 class Query(object):
     """
     Object representing the desired search query operation to build. The Query uses the Selectors
@@ -26,6 +25,10 @@ class Query(object):
             if kwargs[key] is not None:
                 self.kwargs[key] = value
 
+        self.number = 0
+        self.to_return = 'NEO'
+        self.dates = Query.DateSearch('e',0)
+        self.filters={}
     def build_query(self):
         """
         Transforms the provided query options, set upon initialization, into a set of Selectors that the NEOSearcher
@@ -38,10 +41,12 @@ class Query(object):
             self.dates = Query.DateSearch('between',value)
         else:
             self.dates = Query.DateSearch('equals',self.kwargs['date'])
-            self.number = self.kwargs['number']
-            self.to_return = self.kwargs['return_object']
-
-        return Query.Selectors(self.dates,self.number,'',self.to_return)
+        self.number = self.kwargs['number']
+        self.to_return = self.kwargs['return_object']
+        if('filter' in self.kwargs.keys()):
+            self.filters = Filter.create_filter_options(self.kwargs['filter'])
+        print(self.filters)
+        return Query.Selectors(self.dates,self.number,self.filters,self.to_return)
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
 
 
@@ -51,11 +56,17 @@ class Filter(object):
     Each filter is one of Filter.Operators provided with a field to filter on a value.
     """
     Options = {
-        # TODO: Create a dict of filter name to the NearEarthObject or OrbitalPath property
+        'distance':'miss_distance_kilometers',
+        'diameter':'diameter_min_km',
+        'is_hazardous':'is_potentially_hazardous_asteroid'
     }
 
     Operators = {
-        # TODO: Create a dict of operator symbol to an Operators method, see README Task 3 for hint
+        '<':operator.lt,
+        '>':operator.gt,
+        '=':operator.eq,
+        '<=':operator.le,
+        '>=':operator.ge
     }
 
     def __init__(self, field, object, operation, value):
@@ -78,9 +89,15 @@ class Filter(object):
         :param input: list in format ["filter_option:operation:value_of_option", ...]
         :return: defaultdict with key of NearEarthObject or OrbitPath and value of empty list or list of Filters
         """
-
+        filter_dict={'NearEarthObject':[], 'OrbitPath':[]}
+        for filter in filter_options:
+            elements_in_filter = filter.split(":")
+            if(elements_in_filter[0]=='diameter' or elements_in_filter[0] == 'is_hazardous'):
+                filter_dict['NearEarthObject'].append(Filter(elements_in_filter[0],'NEO',elements_in_filter[1],elements_in_filter[2]))
+            elif (elements_in_filter[0]=='distance'):
+                filter_dict['OrbitPath'].append(Filter(elements_in_filter[0],'orbit',elements_in_filter[1],elements_in_filter[2]))
         # TODO: return a defaultdict of filters with key of NearEarthObject or OrbitPath and value of empty list or list of Filters
-
+        return filter_dict
     def apply(self, results):
         """
         Function that applies the filter operation onto a set of results
@@ -88,6 +105,21 @@ class Filter(object):
         :param results: List of Near Earth Object results
         :return: filtered list of Near Earth Object results
         """
+        filtered_neos = []
+        test = False
+        for neo in results:
+            if(self.object == 'NEO'):
+                value = getattr(neo,self.Options(self.field))
+                test = self.Operators[self.operation](value,self.value)
+            elif(self.object == 'orbit'):
+                for orbit in neo.orbits:
+                    value = getattr(orbit,self.Options(self.field))
+                    test = self.Operators[self.operation](value,self.value)
+                    if(test):
+                        break
+            if(test):
+                filtered_neos.append(neo)
+        return filtered_neos
         # TODO: Takes a list of NearEarthObjects and applies the value of its filter operation to the results
 
 
@@ -142,11 +174,10 @@ class NEOSearcher(object):
                 if((datetime.strptime(start,"%Y-%m-%d") <= datetime.strptime(i,"%Y-%m-%d")) and (datetime.strptime(end,"%Y-%m-%d") >= datetime.strptime(i,"%Y-%m-%d"))):
                     for j in self.db.orbits[i]:
                         neos.append(j)
-
             neos = list(set(neos))
             for i in list(neos):
                 neos_list.append(self.db.neos[i])
-                count= count-1
+                count = count-1
                 if(count == 0):
                     break
 
