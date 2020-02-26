@@ -17,3 +17,17 @@ Issue no 2
 Solution For 2
 -------------------
 So when we receive kwargs in query init function we remove all the Key,value pairs with None as value so that only required Keys are present.
+
+
+Issue no 3
+---------------
+When i was going through result of test cases where we apply filter it shows wrong answer and the reasons were the neos on which we apply filter had duplicate neos also and some of the neo where containing true in the hazardous
+filed.
+
+Solution 3
+---------------
+In Search file before applying filter convert neo name list to set and then add neo objects to neo_list so duplicate elements will not add into list. In Models file when storing hazardous store them as boolean False or 
+boolean True not in String format.
+
+
+

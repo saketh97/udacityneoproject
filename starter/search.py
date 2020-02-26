@@ -4,6 +4,7 @@ from datetime import datetime
 from exceptions import UnsupportedFeature
 from models import NearEarthObject, OrbitPath
 import operator
+
 class Query(object):
     """
     Object representing the desired search query operation to build. The Query uses the Selectors
@@ -45,7 +46,6 @@ class Query(object):
         self.to_return = self.kwargs['return_object']
         if('filter' in self.kwargs.keys()):
             self.filters = Filter.create_filter_options(self.kwargs['filter'])
-        print(self.filters)
         return Query.Selectors(self.dates,self.number,self.filters,self.to_return)
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
 
@@ -109,11 +109,16 @@ class Filter(object):
         test = False
         for neo in results:
             if(self.object == 'NEO'):
-                value = getattr(neo,self.Options(self.field))
+                value = getattr(neo,self.Options[self.field])
+                if(self.field == 'is_hazardous'):
+                    self.value = bool(self.value)
+                else:
+                    self.value = float(self.value)
                 test = self.Operators[self.operation](value,self.value)
             elif(self.object == 'orbit'):
                 for orbit in neo.orbits:
-                    value = getattr(orbit,self.Options(self.field))
+                    value = getattr(orbit,self.Options[self.field])
+                    self.value = float(self.value)
                     test = self.Operators[self.operation](value,self.value)
                     if(test):
                         break
@@ -154,13 +159,15 @@ class NEOSearcher(object):
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
         date = query[0]
         count = query[1]
+        filters = query[2]
         neos_list=[]
+        neo_names = []
         if('equals' in date[0]):
             try:
-                neos_names = self.db.orbits[date[1]]
-                for i in neos_names:
+                neo_names = self.db.orbits[date[1]]
+                neo_names=set(neo_names)
+                for i in neo_names:
                     neos_list.append(self.db.neos[i])
-                    count= count-1
                     if(count == 0):
                         break
             except:
@@ -169,16 +176,19 @@ class NEOSearcher(object):
         elif('between' in date[0]):
             start = date[1].split(',')[0]
             end = date[1].split(',')[1]
-            neos=[]
+            neo_names=[]
             for i in self.db.orbits.keys():
                 if((datetime.strptime(start,"%Y-%m-%d") <= datetime.strptime(i,"%Y-%m-%d")) and (datetime.strptime(end,"%Y-%m-%d") >= datetime.strptime(i,"%Y-%m-%d"))):
                     for j in self.db.orbits[i]:
-                        neos.append(j)
-            neos = list(set(neos))
-            for i in list(neos):
+                        neo_names.append(j)
+            neo_names = set(neo_names)
+            for i in neo_names:
                 neos_list.append(self.db.neos[i])
-                count = count-1
                 if(count == 0):
                     break
 
-        return neos_list
+        for key,value in filters.items():
+            for filt in value:
+                neos_list = filt.apply(neos_list)
+
+        return neos_list[0:10]

@@ -14,7 +14,10 @@ class NearEarthObject(object):
         self.id = kwargs['id']
         self.name =kwargs['name']
         self.diameter_min_km = float(kwargs['estimated_diameter_min_kilometers'])
-        self.is_potentially_hazardous_asteroid = bool(kwargs['is_potentially_hazardous_asteroid'])
+        if (kwargs['is_potentially_hazardous_asteroid'] == 'False'):
+            self.is_potentially_hazardous_asteroid = bool(0)
+        else:
+            self.is_potentially_hazardous_asteroid = bool(1)
         self.orbits.append(OrbitPath(**kwargs))
 
     def update_orbits(self, orbit):
